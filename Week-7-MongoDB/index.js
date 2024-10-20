@@ -1,29 +1,59 @@
 const express = require("express");
 const { UserModel, TodoModel } = require("./db");
 const jwt = require("jsonwebtoken");
-const JWT_SECRET = "abc";
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const { z } = require("zod");
 
-mongoose.connect("mongodb+srv://vishal:vishal99@cluster0.rfzt0.mongodb.net/todo-app")
+require("dotenv").config();
+
+mongoose.connect(process.env.DB_URL).then(function () {
+    console.log(`DB connected`);
+
+})
 
 const app = express();
 
 app.use(express.json());
 
 app.post("/signup", async function (req, res) {
+
+    const requiredBody = z.object({
+        email: z.string().min(5).max(100).email(),
+        name: z.string().min(3).max(100),
+        password: z.string().min(3).max(30)
+    })
+
+    const parseData =  requiredBody.safeParse(req.body);
+
+    if(!parseData.success) {
+        return res.json({
+            message: "Incorrect format",
+            // error: parseData.error.issues[0].message
+        })
+    }
+
     const email = req.body.email;
     const password = req.body.password;
     const name = req.body.name;
 
-    await UserModel.create({
-        email: email,
-        password: password,
-        name: name
-    });
+    try {
+        const hashPassword = await bcrypt.hash(password.toString(), 5);
 
-    res.json({
-        message: " You are signed up"
-    })
+        await UserModel.create({
+            email: email,
+            password: hashPassword,
+            name: name
+        });
+
+        res.json({
+            message: "You are signed up"
+        })
+    } catch (err) {
+        res.json({
+            error: err.toString()
+        })
+    }
 });
 
 app.post("/signin", async function (req, res) {
@@ -32,16 +62,19 @@ app.post("/signin", async function (req, res) {
 
     const user = await UserModel.findOne({
         email: email,
-        password: password,
     });
 
-    console.log(user);
+    if (!user) return res.status(403).json({ message: "User does not exist." });
+
+    const passwordMatch = await bcrypt.compare(password.toString(), user.password);
+
+    // console.log(user);
 
 
-    if (user) {
+    if (passwordMatch) {
         const token = jwt.sign({
             id: user._id
-        }, JWT_SECRET);
+        }, process.env.JWT_SECRET);
         res.json({
             token: token
         });
@@ -82,7 +115,7 @@ app.get("/todos", auth, async function (req, res) {
 function auth(req, res, next) {
     const token = req.headers.token;
 
-    const decodedData = jwt.verify(token, JWT_SECRET);
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
 
     if (decodedData) {
         req.userId = decodedData.id;
