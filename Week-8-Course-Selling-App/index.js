@@ -5,10 +5,14 @@ const mongoose = require("mongoose");
 const { userRouter } = require("./routes/userRoutes");
 const { courseRouter } = require("./routes/courseRoutes");
 const { adminRouter } = require("./routes/adminRoutes");
+const cookieParser = require("cookie-parser");
 
 require("dotenv").config();
 
 const app = express();
+
+app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/admin", adminRouter);
@@ -20,7 +24,6 @@ async function main() {
         console.log(`Server started at port ${process.env.PORT}`);
         console.log(`DB connected`);
     });
-
 }
 main()
 
