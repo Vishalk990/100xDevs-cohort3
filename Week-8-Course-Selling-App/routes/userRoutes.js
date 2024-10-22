@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const { z } = require("zod");
 const jwt = require("jsonwebtoken");
 const { userModel } = require("../db");
-const { auth } = require("../middlewares/user.auth");
+const { userAuthMiddleware } = require("../middlewares/user.auth");
 
 
 userRouter.post("/signup", async function (req, res) {
@@ -88,7 +88,7 @@ userRouter.post("/signin", async function (req, res) {
             userId: existingUser._id,
             email: existingUser.email,
             firstName: existingUser.firstName
-        }, process.env.JWT_SECRET);
+        }, process.env.JWT_USER_SECRET);
 
         return res.status(200).cookie("jwt", token).json({
             message: "Signin successfull",
@@ -102,7 +102,7 @@ userRouter.post("/signin", async function (req, res) {
     }
 })
 
-userRouter.get("/purchases", auth, function (req, res) {
+userRouter.get("/purchases", userAuthMiddleware, function (req, res) {
 
     const { username, userId } = req.headers;
     return res.json({
