@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const { z } = require("zod");
 const jwt = require("jsonwebtoken");
 const adminRouter = Router();
-const { adminModel } = require("../db");
+const { adminModel, courseModel } = require("../db");
 const { adminAuthMiddlware } = require("../middlewares/admin.auth");
 
 adminRouter.post("/signup", async function (req, res) {
@@ -101,25 +101,72 @@ adminRouter.post("/signin", async function (req, res) {
     }
 });
 
-adminRouter.post("/", adminAuthMiddlware, function (req, res) {
+adminRouter.post("/course", adminAuthMiddlware, async function (req, res) {
 
     const { username, adminId } = req.headers;
-    res.json({
-        message: "create course endpoint",
-        username: username,
-        adminId: adminId
-    })
+
+    const { title, description, price, imageUrl } = req.body;
+
+    try {
+        const course = await courseModel.create({
+            title: title,
+            description: description,
+            price: price,
+            imageUrl: imageUrl,
+            creatorId: adminId
+        });
+
+        return res.json({
+            message: "course created successfully",
+            courseId: course._id
+        })
+
+    } catch (err) {
+        return res.json({
+            error: err
+        })
+    }
 })
 
-adminRouter.put("/", function (req, res) {
-    res.json({
+adminRouter.put("/", adminAuthMiddlware, async function (req, res) {
+    const { adminId } = req.headers;
 
-    })
+    const { title, description, price, imageUrl, courseId } = req.body;
+
+
+    try {
+        const course = await courseModel.updateOne({
+            _id: courseId,
+            creatorId: adminId,
+        }, {
+            title: title,
+            description: description,
+            price: price,
+            imageUrl: imageUrl,
+        });
+
+        return res.json({
+            message: "course updated successfully",
+            courseId: course._id
+        })
+
+    } catch (err) {
+        return res.json({
+            error: err
+        })
+    }
 });
 
-adminRouter.get("/bulk", function (req, res) {
-    res.json({
+adminRouter.get("/course/bulk", adminAuthMiddlware, async function (req, res) {
+    const { adminId } = req.headers;
 
+    const courses = await courseModel.find({
+        creatorId: adminId,
+    })
+
+    return res.json({
+        message: "Your courses",
+        courses: courses,
     })
 })
 
