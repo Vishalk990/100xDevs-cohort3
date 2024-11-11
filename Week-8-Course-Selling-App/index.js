@@ -1,6 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 const { userRouter } = require("./routes/userRoutes");
 const { courseRouter } = require("./routes/courseRoutes");
@@ -11,6 +12,10 @@ require("dotenv").config();
 
 const app = express();
 
+app.use(cors({
+    origin: ["http://localhost:5173", "http://localhost:5174"],
+    credentials: true
+}))
 app.use(express.json());
 app.use(cookieParser());
 

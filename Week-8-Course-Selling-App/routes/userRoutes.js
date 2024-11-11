@@ -14,18 +14,21 @@ userRouter.post("/signup", async function (req, res) {
         password: z.string().min(5),
         firstName: z.string().min(2).max(20),
         lastName: z.string().min(2).max(20),
+        userName: z.string().min(2).max(20),
     });
 
     const userParseData = zodUserSchema.safeParse(req.body);
 
     if (!userParseData.success) {
-        return res.json({
+        return res.status(400).json({
             // error: "Incorrect format"
             error: userParseData.error.issues[0].message
         })
     }
 
-    const { email, password, firstName, lastName } = req.body;
+    const { email, password, firstName, lastName, userName } = req.body;
+    console.log(req.body);
+
 
     try {
         const hashedPassword = await bcrypt.hash(password, 5);
@@ -34,40 +37,29 @@ userRouter.post("/signup", async function (req, res) {
             email: email,
             password: hashedPassword,
             firstName: firstName,
-            lastName: lastName
+            lastName: lastName,
+            userName: userName
         });
 
-        return res.json({
+        return res.status(200).json({
             message: "Signup successfull",
             userId: user._id
         })
-    } catch (err) {
-        return res.json({
-            error: err
-        })
+    } catch (error) {
+        if (error?.code === 11000) {
+            return res.status(400).json({ error: "Username or email already exists" });
+        }
+        return res.status(500).json({ error: "Something went wrong" });
     }
 });
 
 userRouter.post("/signin", async function (req, res) {
 
-    const zodUserLoginSchema = z.object({
-        identifier: z.union([z.string().email(), z.string().min(2).max(20)]),
-        password: z.string().min(5),
-    });
-
     const { identifier, password } = req.body;
-
-    const userLoginParseData = zodUserLoginSchema.safeParse(req.body);
-
-    if (!userLoginParseData.success) {
-        return res.json({
-            error: userLoginParseData.error.issues[0].message
-        })
-    }
 
     try {
         const existingUser = await userModel.findOne({
-            $or: [{ email: identifier }, { firstName: identifier }]
+            $or: [{ email: identifier }, { userName: identifier }]
         });
 
         if (!existingUser) {
@@ -90,14 +82,20 @@ userRouter.post("/signin", async function (req, res) {
             firstName: existingUser.firstName
         }, process.env.JWT_USER_SECRET);
 
-        return res.status(200).cookie("jwt", token).json({
-            message: "Signin successfull",
+        // return res.status(200).cookie("jwt", token).json({
+        //     message: "Signin successfull",
+        //     token: token
+        // });
+
+        // Using cookie-based auth here
+        return res.status(200).cookie("token", token, { httpOnly: true }).json({
+            message: "SignIn successfull",
             token: token
         });
 
     } catch (err) {
         return res.status(500).json({
-            err: err
+            error: err
         })
     }
 })
@@ -122,6 +120,31 @@ userRouter.get("/purchases", userAuthMiddleware, async function (req, res) {
     } catch (err) {
         res.json({ err })
     }
+});
+
+userRouter.get("/check-username", async (req, res) => {
+
+    try {
+        const user = await userModel.findOne({
+            userName: req.query.userName,
+        });
+
+        return res.status(200).json({
+            data: user ? false : true,
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            error: error
+        })
+    }
+
+})
+
+userRouter.get("/logout", (req,res) => {
+    res.status(200).clearCookie("token").json({
+        message: "Logout successfull"
+    });
 });
 
 module.exports = {

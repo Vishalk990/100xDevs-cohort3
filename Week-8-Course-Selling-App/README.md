@@ -17,3 +17,8 @@
   - Add a rate limiting middleware
   - Frontend in ejs (low pri)
   - Frontend in React
+
+
+Cookie based auth steps
+1. npm i cookie-parser
+2. use cookie-parser as global middleware and also allow cors with {credentials: true} 
