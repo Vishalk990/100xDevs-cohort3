@@ -22,3 +22,19 @@
 Cookie based auth steps
 1. npm i cookie-parser
 2. use cookie-parser as global middleware and also allow cors with {credentials: true} 
+
+
+'perano': {
+        '50': '#f0f5fd',
+        '100': '#e4ecfb',
+        '200': '#cedbf7',
+        '300': '#9fb7ef',
+        '400': '#8fa3ea',
+        '500': '#7484e0',
+        '600': '#5961d2',
+        '700': '#494eb9',
+        '800': '#3e4495',
+        '900': '#383e77',
+        '950': '#212445',
+    },
+    

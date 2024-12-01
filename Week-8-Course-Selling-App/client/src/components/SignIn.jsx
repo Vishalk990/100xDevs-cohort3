@@ -30,91 +30,119 @@ export default function SignIn() {
   const { loading, handleSignIn } = useHandleSignIn(formData, setFormData);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-blue-50 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center text-blue-600">
-            Sign in
-          </CardTitle>
-          <CardDescription className="text-center text-gray-600">
-            Enter your details to access your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div>
-            <div className="grid gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-700">
-                  Email or Username
-                </Label>
-                <Input
-                  id="email"
-                  name="identifier"
-                  placeholder="email or firstName"
-                  required
-                  value={formData.identifier}
-                  type="text"
-                  className="border-blue-200 focus:ring-blue-400"
-                  onChange={(e) => handleInput(e)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-gray-700">
-                  Password
-                </Label>
-                <div className="relative">
+    <div className="grid grid-cols-12 gap-4 px-4">
+      <div className="col-span-6 bg-perano-600 my-4 rounded-xl"></div>
+      <div className="grid col-span-6 place-items-center border border-black min-h-[95vh] bg-perano-50 px-4 rounded-xl my-4">
+        <Card className="w-full max-w-md border border-black">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold font-inter text-center text-perano-600">
+              Sign in
+            </CardTitle>
+            <CardDescription className="text-center font-nunito text-gray-600">
+              Enter your details to access your account
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div>
+              <div className="grid gap-4 font-nunito">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-gray-700">
+                    Email or Username
+                  </Label>
                   <Input
-                    id="password"
-                    name="password"
+                    id="email"
+                    name="identifier"
+                    placeholder="email or firstName"
                     required
-                    type={type}
-                    className="border-blue-200 focus:ring-blue-400 pr-10"
-                    value={formData.password}
+                    value={formData.identifier}
+                    type="text"
+                    className="border-perano-200 focus:ring-perano-400"
                     onChange={(e) => handleInput(e)}
                   />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-500"
-                    aria-label="Toggle password visibility"
-                    onClick={() =>
-                      setType((prev) =>
-                        prev === "password" ? "text" : "password"
-                      )
-                    }
-                  >
-                    <Eye className="h-5 w-5" />
-                  </button>
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-gray-700">
+                    Password
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      name="password"
+                      required
+                      type={type}
+                      className="border-perano-200 focus:ring-perano-400 pr-10"
+                      value={formData.password}
+                      onChange={(e) => handleInput(e)}
+                    />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-500"
+                      aria-label="Toggle password visibility"
+                      onClick={() =>
+                        setType((prev) =>
+                          prev === "password" ? "text" : "password"
+                        )
+                      }
+                    >
+                      <Eye className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  className={`w-full bg-perano-600 text-white hover:bg-perano-700 transition-opacity ${
+                    loading ? "opacity-50 cursor-not-allowed" : "opacity-100"
+                  }`}
+                  disabled={loading}
+                  onClick={handleSignIn}
+                  aria-busy={loading}
+                >
+                  {loading ? "Loading..." : "Sign In"}
+                </Button>
               </div>
-              <Button
-                type="button"
-                className={`w-full bg-blue-600 text-white hover:bg-blue-700 transition-opacity ${
-                  loading ? "opacity-50 cursor-not-allowed" : "opacity-100"
-                }`}
-                disabled={loading}
-                onClick={handleSignIn}
-                aria-busy={loading}
-              >
-                {loading ? "Loading..." : "Sign In"}
-              </Button>
             </div>
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-wrap items-center justify-between gap-2">
-          <div className="text-sm text-gray-600">
-            Don't have an account?{" "}
-            <Link to="/signup" className="text-blue-600 hover:underline">
-              Sign up
+          </CardContent>
+          <CardFooter className="flex flex-wrap items-center justify-between gap-2 font-nunito">
+            <div className="text-sm font-bold text-gray-600">
+              Don't have an account?{" "}
+              <Link to="/signup" className="text-perano-600 hover:underline">
+                Sign up
+              </Link>
+            </div>
+            <Link
+              href="/forgot-password"
+              className="text-sm text-perano-600 hover:underline"
+            >
+              Forgot password?
             </Link>
-          </div>
-          <Link
-            href="/forgot-password"
-            className="text-sm text-blue-600 hover:underline"
+          </CardFooter>
+        </Card>
+        <div className="">Or login with</div>
+        <div className="flex items-center border border-black min-w-80 gap-12">
+          <Button
+            type="button"
+            className={`w-full bg-perano-600 text-white hover:bg-perano-700 transition-opacity ${
+              loading ? "opacity-50 cursor-not-allowed" : "opacity-100"
+            }`}
+            disabled={loading}
+            // onClick={handleSignIn}
+            aria-busy={loading}
           >
-            Forgot password?
-          </Link>
-        </CardFooter>
-      </Card>
+            {loading ? "Loading..." : "Google"}
+          </Button>
+          <Button
+            type="button"
+            className={`w-full bg-perano-600 text-white hover:bg-perano-700 transition-opacity ${
+              loading ? "opacity-50 cursor-not-allowed" : "opacity-100"
+            }`}
+            disabled={loading}
+            // onClick={handleSignIn}
+            aria-busy={loading}
+          >
+            {loading ? "Loading..." : "Apple"}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

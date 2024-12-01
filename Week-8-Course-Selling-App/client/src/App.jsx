@@ -25,7 +25,7 @@ export default function App() {
     },
   ]);
   return (
-    <div className="font-custom">
+    <div>
       <Toaster />
       <RouterProvider router={Router}></RouterProvider>
     </div>
