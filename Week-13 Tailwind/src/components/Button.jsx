@@ -1,4 +1,4 @@
-export const Button = ({ disabled, children, onClick, setDisabled }) => {
+export const Button = ({ disabled, children, onClick }) => {
   return (
     <button
       onClick={onClick}

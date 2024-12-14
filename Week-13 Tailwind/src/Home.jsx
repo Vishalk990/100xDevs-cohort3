@@ -8,7 +8,7 @@ export const Home = () => {
   const [disabled, setDisabled] = useState(true);
 
   const handleChange = (value) => {
-    setVal(val);
+    setVal(value);
     setDisabled(value.trim() === "");
   };
 
@@ -27,7 +27,7 @@ export const Home = () => {
       <Input
         type="text"
         placeholder={"Your birth year"}
-        onChange={handleChange}
+        handleChange={handleChange}
       />
       <Button disabled={disabled} setDisabled={setDisabled}>
         Continue
